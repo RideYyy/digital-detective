@@ -1,0 +1,8 @@
+services:
+  detective:
+    build: .
+    volumes:
+      - ./reports:/reports
+    environment:
+      DIGITAL_DETECTIVE_USER_AGENT: ${DIGITAL_DETECTIVE_USER_AGENT:-DigitalDetective/1.0 (Docker educational project)}
+    command: ["--help"]
