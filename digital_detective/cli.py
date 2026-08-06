@@ -9,6 +9,7 @@ import re
 from pathlib import Path
 from typing import Sequence
 
+from . import __version__
 from .http_client import DataSourceError, HttpClient
 from .reports import render_report, report_stem, save_report
 from .search import SearchService
@@ -50,7 +51,8 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("-un", "--username", type=username_argument, metavar="USERNAME", help="check a username on ten popular platforms")
     parser.add_argument("--output-dir", type=Path, default=Path("reports"), help="report directory (default: reports)")
     parser.add_argument("--json", action="store_true", help="also save a structured JSON report")
-    parser.add_argument("--version", action="version", version="Digital Detective 1.1.0")
+    parser.add_argument("--html", action="store_true", help="also save a visual HTML dashboard")
+    parser.add_argument("--version", action="version", version=f"Digital Detective {__version__}")
     return parser
 
 
@@ -62,7 +64,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.name_hint and not args.name:
         parser.error("--name-hint requires -n/--name")
 
-    user_agent = os.getenv("DIGITAL_DETECTIVE_USER_AGENT", "DigitalDetective/1.1 (educational OSINT; contact: local-user)")
+    user_agent = os.getenv("DIGITAL_DETECTIVE_USER_AGENT", f"DigitalDetective/{__version__} (educational OSINT; contact: local-user)")
     service = SearchService(HttpClient(user_agent=user_agent))
     results = []
     failed = 0
@@ -90,8 +92,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     rendered = render_report(results)
     print(rendered, end="")
     stem = report_stem(args.name, args.ip, args.username)
-    text_path, json_path = save_report(args.output_dir, stem, results, args.json)
+    text_path, json_path, html_path = save_report(args.output_dir, stem, results, args.json, args.html)
     print(f"Result written to file: {text_path}")
     if json_path:
         print(f"JSON written to file: {json_path}")
+    if html_path:
+        print(f"HTML visualization written to file: {html_path}")
     return 1 if failed == len(results) else 0
