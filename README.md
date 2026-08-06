@@ -1,8 +1,20 @@
 # Digital Detective
 
+**Author:** Nikita Drõndin
+
 Digital Detective is a command-line OSINT tool. It accepts a full name, an IP
 address, a social-media username, or several parameters together. Results are
 printed in the terminal and saved without overwriting earlier reports.
+
+## Disclaimer
+
+This software is an educational project created to demonstrate responsible
+OSINT techniques. Use it only for lawful purposes and only with information
+that is publicly accessible. Users are responsible for following applicable
+laws, privacy requirements, and the terms of each data source. Search results
+may be incomplete, outdated, or incorrect and must not be treated as verified
+facts. The author is not responsible for misuse, unauthorized surveillance,
+harassment, or damage resulting from use of this software.
 
 ## Features
 
@@ -98,6 +110,6 @@ tests/                           automated tests
 Dockerfile, run.sh, run.ps1      Docker startup
 ```
 
-This implementation was written for the Digital Detective assignment. The
-separate Mr.Holmes repository was used only as a feature reference; its source
-code and branding are not included.
+This implementation was written by Nikita Drõndin for the Digital Detective
+assignment. The separate Mr.Holmes repository was used only as a feature
+reference; its source code and branding are not included.

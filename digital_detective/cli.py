@@ -39,7 +39,10 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="data_digger.py",
         description="Gather and cross-reference public OSINT data.",
-        epilog="At least one of -n, -ip or -un is required. Multiple search options may be combined.",
+        epilog=(
+            "Educational use only. Use public information lawfully and verify results. "
+            "At least one of -n, -ip or -un is required; options may be combined."
+        ),
     )
     parser.add_argument("-n", "--name", type=full_name_argument, metavar="FULL_NAME", help="search a full name for publicly listed address and phone")
     parser.add_argument("-ip", "--ip", type=ip_argument, metavar="IP_ADDRESS", help="search an IPv4 or IPv6 address for location and ISP")
