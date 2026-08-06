@@ -29,6 +29,7 @@ class CliTests(unittest.TestCase):
         self.assertIn("-ip IP_ADDRESS", help_text)
         self.assertIn("-un USERNAME", help_text)
         self.assertIn("--name-hint TEXT", help_text)
+        self.assertIn("--html", help_text)
 
     def test_no_arguments_displays_usage(self):
         stderr = io.StringIO()
@@ -40,7 +41,7 @@ class CliTests(unittest.TestCase):
         output = io.StringIO()
         with contextlib.redirect_stdout(output), self.assertRaises(SystemExit):
             main(["--version"])
-        self.assertIn("1.1.0", output.getvalue())
+        self.assertIn("1.2.0", output.getvalue())
 
     def test_invalid_ip_displays_usage(self):
         stderr = io.StringIO()
@@ -60,11 +61,13 @@ class CliTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             output = io.StringIO()
             with contextlib.redirect_stdout(output):
-                code = main(["-n", "Jane Doe", "-ip", "8.8.8.8", "-un", "janedoe", "--output-dir", directory, "--json"])
+                code = main(["-n", "Jane Doe", "-ip", "8.8.8.8", "-un", "janedoe", "--output-dir", directory, "--json", "--html"])
             self.assertEqual(code, 0)
             self.assertIn("Address: Public address", output.getvalue())
             self.assertTrue((Path(directory) / "n_ip_un_jane_doe.txt").exists())
             self.assertTrue((Path(directory) / "n_ip_un_jane_doe.json").exists())
+            self.assertTrue((Path(directory) / "n_ip_un_jane_doe.html").exists())
+            self.assertIn("HTML visualization written to file", output.getvalue())
 
 
 if __name__ == "__main__":

@@ -12,7 +12,7 @@ class LiveIntegrationTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         client = HttpClient(
-            "DigitalDetective/1.1 integration-test",
+            "DigitalDetective/1.2 integration-test",
             policy=RetryPolicy(attempts=2, timeout=15, min_interval=0.2),
         )
         cls.service = SearchService(client)
