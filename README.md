@@ -151,6 +151,22 @@ docker build -t digital-detective .
 docker run --rm -v "./reports:/reports" digital-detective -ip 8.8.8.8 --html --output-dir /reports
 ```
 
+Git Bash on Windows may automatically rewrite Docker paths. After building the
+image, use this command to preserve `/reports` as a container path while
+mounting the local `reports` directory:
+
+```bash
+MSYS2_ARG_CONV_EXCL="*" docker run --rm \
+  -v "$(pwd -W)/reports:/reports" \
+  digital-detective \
+  -ip 8.8.8.8 \
+  --html \
+  --output-dir /reports
+```
+
+The generated `.txt` and `.html` files will appear in the local `reports`
+directory.
+
 ## Tests
 
 ```bash
