@@ -15,6 +15,10 @@ import requests
 class DataSourceError(RuntimeError):
     """A public data source could not return a usable response."""
 
+    def __init__(self, message: str, status_code: int | None = None) -> None:
+        super().__init__(message)
+        self.status_code = status_code
+
 
 @dataclass
 class RetryPolicy:
@@ -70,11 +74,13 @@ class HttpClient:
 
     def get(self, url: str, **kwargs: Any) -> requests.Response:
         last_error: Exception | None = None
+        last_status: int | None = None
         for attempt in range(self.policy.attempts):
             self._pace(url)
             response: requests.Response | None = None
             try:
                 response = self.session.get(url, timeout=self.policy.timeout, **kwargs)
+                last_status = response.status_code
                 if response.status_code == 429 or 500 <= response.status_code < 600:
                     if attempt + 1 < self.policy.attempts:
                         self._sleep(self._retry_delay(response, attempt))
@@ -87,7 +93,10 @@ class HttpClient:
                     break
                 if attempt + 1 < self.policy.attempts:
                     self._sleep(self._retry_delay(response, attempt))
-        raise DataSourceError(f"Request failed for {urlsplit(url).netloc}: {last_error}") from last_error
+        raise DataSourceError(
+            f"Request failed for {urlsplit(url).netloc}: {last_error}",
+            status_code=last_status,
+        ) from last_error
 
     def get_json(self, url: str, **kwargs: Any) -> dict[str, Any]:
         response = self.get(url, **kwargs)

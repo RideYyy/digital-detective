@@ -46,10 +46,17 @@ def render_report(results: list[dict[str, Any]]) -> str:
         if result["type"] == "Full Name":
             lines.extend([
                 f"Matched entity: {result['matched_entity']}",
+                f"Identity: {result.get('identity_description', 'Not found')}",
+                f"Identity status: {result.get('identity_status', 'unknown')}",
                 f"Address: {result['address']}",
+                f"Address type: {result.get('address_type', 'Not found')}",
                 f"Phone Number: {result['phone_number']}",
+                f"Phone type: {result.get('phone_type', 'Not found')}",
+                f"Contact verification: {result.get('contact_verification', 'unavailable')}",
                 f"Confidence: {result['confidence']}",
             ])
+            for candidate in result.get("candidates", []):
+                lines.append(f"Candidate: {candidate['label']} ({candidate['id']}) — {candidate['description']}")
             lines.extend(f"Source: {source}" for source in result.get("sources", []))
         elif result["type"] == "IP":
             lines.extend([
@@ -63,7 +70,8 @@ def render_report(results: list[dict[str, Any]]) -> str:
                 lines.append(f"Source {provider['source']}: {provider['city']}, {provider['country']} / {provider['isp']}")
         else:
             for platform in result.get("platforms", []):
-                lines.append(f"{platform['platform']}: {platform['exists']} ({platform['url']})")
+                method = platform.get("method", "validation method unavailable")
+                lines.append(f"{platform['platform']}: {platform['exists']} ({platform['url']}) — {method}")
             lines.append(f"Validation: {result['confidence']}")
         lines.extend(f"Warning: {error}" for error in result.get("errors", []))
     return "\n".join(lines) + "\n"

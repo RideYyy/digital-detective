@@ -45,11 +45,12 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument("-n", "--name", type=full_name_argument, metavar="FULL_NAME", help="search a full name for publicly listed address and phone")
+    parser.add_argument("--name-hint", metavar="TEXT", help="occupation or location used to disambiguate people with the same name")
     parser.add_argument("-ip", "--ip", type=ip_argument, metavar="IP_ADDRESS", help="search an IPv4 or IPv6 address for location and ISP")
     parser.add_argument("-un", "--username", type=username_argument, metavar="USERNAME", help="check a username on ten popular platforms")
     parser.add_argument("--output-dir", type=Path, default=Path("reports"), help="report directory (default: reports)")
     parser.add_argument("--json", action="store_true", help="also save a structured JSON report")
-    parser.add_argument("--version", action="version", version="Digital Detective 1.0.0")
+    parser.add_argument("--version", action="version", version="Digital Detective 1.1.0")
     return parser
 
 
@@ -58,26 +59,28 @@ def main(argv: Sequence[str] | None = None) -> int:
     args = parser.parse_args(argv)
     if not any((args.name, args.ip, args.username)):
         parser.error("at least one search option is required; use --help for usage")
+    if args.name_hint and not args.name:
+        parser.error("--name-hint requires -n/--name")
 
-    user_agent = os.getenv("DIGITAL_DETECTIVE_USER_AGENT", "DigitalDetective/1.0 (educational OSINT; contact: local-user)")
+    user_agent = os.getenv("DIGITAL_DETECTIVE_USER_AGENT", "DigitalDetective/1.1 (educational OSINT; contact: local-user)")
     service = SearchService(HttpClient(user_agent=user_agent))
     results = []
     failed = 0
     searches = (
-        (args.name, service.search_name),
-        (args.ip, service.search_ip),
-        (args.username, service.search_username),
+        (args.name, "name", lambda value: service.search_name(value, args.name_hint)),
+        (args.ip, "ip", service.search_ip),
+        (args.username, "username", service.search_username),
     )
-    for value, search in searches:
+    for value, search_type, search in searches:
         if value is None:
             continue
         try:
             results.append(search(value))
         except (ValueError, DataSourceError) as exc:
             failed += 1
-            if search.__name__ == "search_name":
-                result = {"type": "Full Name", "query": value, "matched_entity": "Not found", "address": "Not found", "phone_number": "Not found", "confidence": "none", "sources": []}
-            elif search.__name__ == "search_ip":
+            if search_type == "name":
+                result = {"type": "Full Name", "query": value, "matched_entity": "Not found", "identity_description": "Not found", "identity_status": "not found", "address": "Not found", "address_type": "Not found", "phone_number": "Not found", "phone_type": "Not found", "contact_verification": "unavailable", "confidence": "none", "candidates": [], "sources": []}
+            elif search_type == "ip":
                 result = {"type": "IP", "query": value, "location": "Not found", "coordinates": "Not found", "isp": "Not found", "cross_reference": "unavailable", "confidence": "none", "providers": []}
             else:
                 result = {"type": "Username", "query": value, "platforms": [], "confidence": "none"}
