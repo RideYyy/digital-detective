@@ -19,11 +19,13 @@ harassment, or damage resulting from use of this software.
 ## Features
 
 - `-n/--name`: searches Wikidata and an official website for publicly listed
-  address and phone information.
+  professional contact information. Same-name candidates are filtered to human
+  entities and are not selected automatically when identity is ambiguous.
 - `-ip/--ip`: returns location and ISP data cross-referenced through IPWhoIs
   and ipapi.
 - `-un/--username`: checks GitHub, GitLab, Reddit, Instagram, X, TikTok,
-  Facebook, Twitch, Pinterest, and Steam.
+  Facebook, Twitch, Pinterest, and Steam using conservative `yes`, `no`, and
+  `unknown` results.
 - Multiple search parameters can be combined in one command.
 - A text report is always created; `--json` adds structured JSON output.
 - Existing reports receive numeric suffixes instead of being overwritten.
@@ -48,9 +50,22 @@ shown in `.env.example`; real `.env` files are excluded by `.gitignore`.
 ```text
 python data_digger.py --help
 python data_digger.py -n "Jane Example"
+python data_digger.py -n "John Smith" --name-hint "American scientist"
 python data_digger.py -ip 8.8.8.8
 python data_digger.py -un "@octocat"
 python data_digger.py -n "Jane Example" -ip 8.8.8.8 -un janedoe --json
+```
+
+`--name-hint` accepts an occupation or location to distinguish people who have
+the same name. The name report labels addresses and phone numbers as public
+official/business contacts and indicates whether two sources confirmed them.
+
+Username statuses mean:
+
+```text
+yes      an API or profile metadata unambiguously confirms the username
+no       a 404 or explicit missing-profile response was received
+unknown  login wall, CAPTCHA, redirect, blocking, or ambiguous page
 ```
 
 Reports are written to `reports` by default:
@@ -97,6 +112,14 @@ python -m unittest discover -s tests -v
 The test suite covers CLI help and invalid input, name/IP/username searches,
 cross-referencing, report naming, repeated files, JSON output, multiple search
 parameters, public contact extraction and network retry behavior.
+
+Optional live integration tests use stable public examples and require network
+access:
+
+```powershell
+$env:RUN_INTEGRATION_TESTS='1'
+python -m unittest tests.test_integration -v
+```
 
 ## Project structure
 

@@ -6,3 +6,5 @@ __pycache__/
 venv/
 .env
 reports/
+.verification-reports/
+.docker-verification/

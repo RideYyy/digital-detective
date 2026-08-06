@@ -4,5 +4,5 @@ services:
     volumes:
       - ./reports:/reports
     environment:
-      DIGITAL_DETECTIVE_USER_AGENT: ${DIGITAL_DETECTIVE_USER_AGENT:-DigitalDetective/1.0 (Docker educational project)}
+      DIGITAL_DETECTIVE_USER_AGENT: ${DIGITAL_DETECTIVE_USER_AGENT:-DigitalDetective/1.1 (Docker educational project)}
     command: ["--help"]
