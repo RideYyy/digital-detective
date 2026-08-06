@@ -28,6 +28,8 @@ harassment, or damage resulting from use of this software.
   `unknown` results.
 - Multiple search parameters can be combined in one command.
 - A text report is always created; `--json` adds structured JSON output.
+- `--html` creates a self-contained visual dashboard with consistent cards,
+  comparison tables, confidence labels, warnings, and username status charts.
 - Existing reports receive numeric suffixes instead of being overwritten.
 - Network timeouts, unavailable sources and API errors are handled.
 
@@ -54,6 +56,7 @@ python data_digger.py -n "John Smith" --name-hint "American scientist"
 python data_digger.py -ip 8.8.8.8
 python data_digger.py -un "@octocat"
 python data_digger.py -n "Jane Example" -ip 8.8.8.8 -un janedoe --json
+python data_digger.py -ip 8.8.8.8 -un octocat --html
 ```
 
 `--name-hint` accepts an occupation or location to distinguish people who have
@@ -109,6 +112,22 @@ reports/n_ip_un_jane_example.txt
 A repeated search creates `n_jane_example1.txt`, then
 `n_jane_example2.txt`. Use `--output-dir PATH` to select another directory.
 
+## Visual report
+
+Add `--html` to any single or combined search. The tool still prints and saves
+the required text report, and also creates an HTML file with the same name:
+
+```powershell
+python data_digger.py -n "Katherine L Milkman" -ip 8.8.8.8 -un octocat --html
+start reports\n_ip_un_katherine_l_milkman.html
+```
+
+Every search type uses the same dashboard layout. Full-name results show a
+contact and source table, IP results compare providers side by side, and
+username results include status totals, a visual status bar, and a platform
+table. The report is responsive, works offline after generation, and escapes
+data received from public sources before placing it in HTML.
+
 ## Docker
 
 Docker is the only dependency when using a startup script.
@@ -129,7 +148,7 @@ Direct Docker commands:
 
 ```bash
 docker build -t digital-detective .
-docker run --rm -v "./reports:/reports" digital-detective -ip 8.8.8.8 --output-dir /reports
+docker run --rm -v "./reports:/reports" digital-detective -ip 8.8.8.8 --html --output-dir /reports
 ```
 
 ## Tests
@@ -139,7 +158,8 @@ python -m unittest discover -s tests -v
 ```
 
 The test suite covers CLI help and invalid input, name/IP/username searches,
-cross-referencing, report naming, repeated files, JSON output, multiple search
+cross-referencing, report naming, repeated files, JSON and HTML output,
+consistent visualization across search types, HTML escaping, multiple search
 parameters, public contact extraction and network retry behavior.
 
 Optional live integration tests use stable public examples and require network
@@ -163,5 +183,4 @@ Dockerfile, run.sh, run.ps1      Docker startup
 ```
 
 This implementation was written by Nikita Drõndin for the Digital Detective
-assignment. The separate Mr.Holmes repository was used only as a feature
-reference; its source code and branding are not included.
+assignment.
