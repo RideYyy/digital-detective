@@ -60,6 +60,35 @@ python data_digger.py -n "Jane Example" -ip 8.8.8.8 -un janedoe --json
 the same name. The name report labels addresses and phone numbers as public
 official/business contacts and indicates whether two sources confirmed them.
 
+### Reviewer example: public professional contact
+
+The following reproducible example demonstrates the full-name search with a
+publicly listed professional address and telephone number:
+
+```bash
+python data_digger.py -n "Katherine L Milkman" --name-hint "Wharton professor"
+```
+
+At the time of testing, the result identifies Katherine L Milkman and returns
+her publicly listed Wharton office address and telephone number. The report
+includes links to Wikidata and her official website so reviewers can verify
+the result. The middle initial is intentional: searching only for
+`Katherine Milkman` does not produce an exact identity match.
+
+Expected fields:
+
+```text
+Matched entity: Katherine L Milkman (Q87774070)
+Address: 3730 Walnut Street
+566 Jon M. Huntsman Hall
+Philadelphia, PA 19104
+Phone Number: 215-573-9646
+Confidence: medium
+```
+
+Because this information comes from live public sources, availability may
+change if the owner updates the official website or Wikidata entry.
+
 Username statuses mean:
 
 ```text
